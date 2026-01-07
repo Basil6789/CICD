@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 name: First workflow
 
 on: 
@@ -29,3 +30,22 @@ jobs:
       - name: Install dependencies
         if: files.exists('package.json')   # runs only if package.json exists
         run: npm install
+=======
+name: First workflow
+
+on:  
+  push:
+    branches:
+      -main
+
+
+jobs:
+  random-jobs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print a welcome message
+        run: echo "Welcome to my place"
+    
+ 
+>>>>>>> a516f26 (add repo)
