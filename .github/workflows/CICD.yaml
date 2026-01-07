@@ -1,0 +1,21 @@
+name: Node ja App
+
+on:
+    push:
+        branches: [main]
+
+    pull-request:
+        branches: [main]
+
+jobs:
+    build:
+        runs-on:ubuntu-latest
+        steps:
+            -name: Checkout repo
+             uses: actions/checkout@v4
+
+            -name: Login to DockerHub
+             uses: docker/login-action@v3
+             with:
+              username: ${secrets.UNAME} 
+              password: ${secrets.Docker_PAT}
