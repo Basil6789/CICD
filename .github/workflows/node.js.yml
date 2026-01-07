@@ -1,6 +1,6 @@
 name: First workflow
 
-on:
+on: 
   push:
     branches:
       - main
