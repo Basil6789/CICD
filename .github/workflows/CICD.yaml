@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  prepare:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,3 +19,12 @@ jobs:
         with:
           username: ${{ secrets.Docker_UNAME }}
           password: ${{ secrets.Docker_PAT }}
+
+      - name : Build and push
+        uses: docker/build-push-action@v6
+
+        with:
+         context: .
+         file: ./Dockerfile
+         push: true 
+         tags: basil6789/nodeapp:555
