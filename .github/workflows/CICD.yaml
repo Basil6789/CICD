@@ -36,7 +36,6 @@ jobs:
           username: ${{ secrets.HOST_NAME }}
           key: ${{ secrets.KEY }}
           script: |
-            docker pull basil6789/nodeapp:555
-            docker stop nodeapp || true
-            docker rm nodeapp || true
-            docker run -d --name nodeapp -p 81:3000 basil6789/nodeapp:latest
+            echo "pull latest image"
+            docker pull ${{ secrets.Docker_UNAME }}/nodeapp:latest
+            docker run -dp 81:3000 --name nodeapp ${{ secrets.Docker_UNAME }}/nodeapp:latest
