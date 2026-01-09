@@ -39,4 +39,4 @@ jobs:
             docker pull basil6789/nodeapp:555
             docker stop nodeapp || true
             docker rm nodeapp || true
-            docker run -d --name nodeapp -p 80:3000 basil6789/nodeapp:555
+            docker run -d --name nodeapp -p 81:3000 basil6789/nodeapp:latest
