@@ -9,7 +9,6 @@ on:
 jobs:
   prepare:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -28,3 +27,20 @@ jobs:
          file: ./Dockerfile
          push: true 
          tags: basil6789/nodeapp:555
+
+deploy:
+  runs-on: ubuntu-latest
+  needs: docker
+  steps:
+
+    - name: ssh to the server
+      uses: appleboy/ssh-actions@v1.0.3
+      with: 
+        host:${{secrets.HOST}}
+        username:${{secrets.HOST_NAME}}
+        key:${{secrets.KEY}}
+        script:
+          echo "pull latest image"
+          docker pull ${{ secrets.Docker_UNAME }}/nodeapp:latest
+
+          docker run -dp 81:3000 --game nodeapp ${{ secrets.Docker_UNAME }}/nodeapp:latest
