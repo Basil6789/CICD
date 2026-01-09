@@ -34,7 +34,7 @@ jobs:
         with:
           host: ${{ secrets.HOST }}              
           username: ${{ secrets.HOST_NAME }}     
-          password: ${{ secrets.KEY }}          
+          password: ${{ secrets.SSH_KEY }}          
           script: |
             echo "Pull latest image"
             docker pull ${{ secrets.Docker_UNAME }}/nodeapp:555
