@@ -1,4 +1,4 @@
-name: Node ja App
+name: Node js App
 
 on:
   push:
@@ -19,28 +19,26 @@ jobs:
           username: ${{ secrets.Docker_UNAME }}
           password: ${{ secrets.Docker_PAT }}
 
-      - name : Build and push
+      - name: Build and push
         uses: docker/build-push-action@v6
-
         with:
-         context: .
-         file: ./Dockerfile
-         push: true 
-         tags: basil6789/nodeapp:555
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: basil6789/nodeapp:555
 
-deploy:
-  runs-on: ubuntu-latest
-  needs: docker
-  steps:
-
-    - name: ssh to the server
-      uses: appleboy/ssh-actions@v1.0.3
-      with: 
-        host:${{secrets.HOST}}
-        username:${{secrets.HOST_NAME}}
-        key:${{secrets.KEY}}
-        script:
-          echo "pull latest image"
-          docker pull ${{ secrets.Docker_UNAME }}/nodeapp:latest
-
-          docker run -dp 81:3000 --game nodeapp ${{ secrets.Docker_UNAME }}/nodeapp:latest
+  deploy:
+    runs-on: ubuntu-latest
+    needs: prepare
+    steps:
+      - name: SSH to the server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.HOST_NAME }}
+          key: ${{ secrets.KEY }}
+          script: |
+            docker pull basil6789/nodeapp:555
+            docker stop nodeapp || true
+            docker rm nodeapp || true
+            docker run -d --name nodeapp -p 80:3000 basil6789/nodeapp:555
