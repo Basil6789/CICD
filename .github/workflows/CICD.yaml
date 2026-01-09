@@ -34,10 +34,8 @@ jobs:
       with:
         host: ${{ secrets.HOST }}              
         username: ${{ secrets.HOST_NAME }}     
-        key: ${{ secrets.KEY }}                
+        password: ${{ secrets.KEY }}          
         script: |
-            echo "Pull latest Docker image"
-            docker pull ${{ secrets.Docker_UNAME }}/nodeapp:555
-            docker stop nodeapp || true
-            docker rm nodeapp || true
-            docker run -dp 81:3000 --name nodeapp ${{ secrets.Docker_UNAME }}/nodeapp:555
+          echo "Pull latest image"
+          docker pull ${{ secrets.Docker_UNAME }}/nodeapp:555
+          docker run -dp 81:3000 --name nodeapp ${{ secrets.Docker_UNAME }}/nodeapp:555latest
