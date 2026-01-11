@@ -40,5 +40,7 @@ jobs:
           script: |
             echo "Remote deploy"
             docker pull basil6789/nodeapp:555
+            docker stop nodeapp || true
+            docker rm nodeapp || true
             docker run -d -p 81:3000 --name nodeapp basil6789/nodeapp:555
-            
+            docker ps 
