@@ -6,7 +6,19 @@ on:
       - main
 
 jobs:
+
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name:  Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Extract version 
+        run: |
+          VERSION=$(jq -r .version package.json)
+          echo "VERSION=$VERSION)" >> $GITHUB_ENV
   docker:
+    needs: prepare
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
