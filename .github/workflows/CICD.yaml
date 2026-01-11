@@ -39,4 +39,6 @@ jobs:
           port: 22
           script: |
             echo "Remote deploy"
+            docker pull basil6789/nodeapp:555
             docker run -d -p 81:3000 --name nodeapp basil6789/nodeapp:555
+            
