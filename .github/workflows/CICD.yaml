@@ -38,5 +38,5 @@ jobs:
           key: ${{ secrets.KEY }}
           port: 22
           script: |
-           echo "Remote deploy"
+            echo "Remote deploy"
            
