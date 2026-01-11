@@ -35,8 +35,12 @@ jobs:
           
           host: ${{ secrets.HOST }}              
           username: ${{ secrets.HOST_NAME }}     
-          key: ${{ secrets.KEY }}  
-          script:
-            echo "pull latest image"
-            docker pull ${{ secrets.Docker_UNAME }}/nodeapp:555
-            docker run -dp 81:3000 --name nodeapp ${{ secrets.Docker_UNAME }}/nodeapp:latest
+<<<<<<< HEAD
+run: echo "local deploy" 
+          
+=======
+run: echo "Remote deploy"         
+          
+>>>>>>> f06f6c3de1173fb164e77091a65e5affdc1f6e33
+          
+run: echo "combined deploy step"
