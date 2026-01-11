@@ -16,8 +16,8 @@ jobs:
       - name: Extract version 
         run: |
           VERSION=$(jq -r .version package.json)
-          echo "VERSION=$VERSION)" >> $GITHUB_ENV
-          echo "version: \ "$VERSION\"" > version.yaml
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version: \ $VERSION\" > version.yaml
           ls -l
 
       - name: Debugging the etracted version
