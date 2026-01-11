@@ -17,9 +17,17 @@ jobs:
         run: |
           VERSION=$(jq -r .version package.json)
           echo "VERSION=$VERSION)" >> $GITHUB_ENV
+          echo "version: \ "$VERSION\"" > version.yaml
+          ls -l
 
       - name: Debugging the etracted version
-        run: echo $VERSION    
+        run: echo $VERSION   
+        
+      - name: Upload Version artifact
+        uses: actions/upload-artifact@versionv4
+        with:
+          name: version
+          path: version.yaml
   docker:
     needs: prepare
     runs-on: ubuntu-latest
