@@ -17,6 +17,9 @@ jobs:
         run: |
           VERSION=$(jq -r .version package.json)
           echo "VERSION=$VERSION)" >> $GITHUB_ENV
+
+      - name: Debugging the etracted version
+        run: echo $VERSION    
   docker:
     needs: prepare
     runs-on: ubuntu-latest
