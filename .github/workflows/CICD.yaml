@@ -13,11 +13,12 @@ jobs:
       - name:  Checkout repo
         uses: actions/checkout@v4
 
-      - name: Extract version 
+      - name: Extract version
         run: |
-          VERSION=$(jq -r .version package.json)
-          echo "version: \ $VERSION\" > version.yaml
-          ls -l
+         VERSION=$(jq -r '.version' package.json)
+         echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+         echo "version: $VERSION" > version.yaml
+         ls -l
 
       - name: Debugging the etracted version
         run: echo $VERSION   
