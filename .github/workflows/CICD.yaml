@@ -16,7 +16,7 @@ jobs:
       - name: Extract version
         run: |
          VERSION=$(jq -r '.version' package.json)
-         echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
          echo "version: $VERSION" > version.yaml
          ls -l
 
@@ -34,6 +34,18 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: version
+
+      - name: load version into envrioment
+        run: | 
+         VERSION=$(grep 'version' version.yaml | awk -F': ' '{print $2}')
+         echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+
+         
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
@@ -44,6 +56,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
+
           context: .
           push: true
           tags: basil6789/nodeapp:555
@@ -65,5 +78,5 @@ jobs:
             docker pull basil6789/nodeapp:555
             docker stop nodeapp || true
             docker rm nodeapp || true
-            docker run -d -p 81:3000 --name nodeapp basil6789/nodeapp:555
+            docker run -d -p 81:3000 --name nodeapp basil6789/nodeapp:{{ENV_VERSION}}
             docker ps 
