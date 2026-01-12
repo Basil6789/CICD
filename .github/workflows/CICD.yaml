@@ -41,7 +41,7 @@ jobs:
 
       - name: load version into envrioment
         run: | 
-         VERSION=$(grep 'version' version.yaml | awk -F': ' '{print $2}')
+         VERSION=$(grep 'version' version.yaml | cut -d'"' -f2
          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
 
@@ -59,7 +59,7 @@ jobs:
 
           context: .
           push: true
-          tags: basil6789/nodeapp:{{ENV_VERSION}}
+          tags: basil6789/nodeapp:${{ENV.VERSION}}
 
   deploy:
     runs-on: ubuntu-latest
@@ -75,8 +75,8 @@ jobs:
           port: 22
           script: |
             echo "Remote deploy"
-            docker pull basil6789/nodeapp:555
+            docker pull basil6789/nodeapp:${{ENV.VERSION}}
             docker stop nodeapp || true
             docker rm nodeapp || true
-            docker run -d -p 81:3000 --name nodeapp basil6789/nodeapp:{{ENV_VERSION}}
+            docker run -d -p 81:3000 --name nodeapp basil6789/nodeapp:${{ENV.VERSION}}
             docker ps 
