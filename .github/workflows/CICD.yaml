@@ -1,4 +1,4 @@
-name: Node JS App CI/CD
+name: Node js App
 
 on:
   push:
@@ -8,18 +8,25 @@ on:
 jobs:
   prepare:
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_version.outputs.version }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Get version from package.json
-        id: get_version
+      - name: Extract version
         run: |
           VERSION=$(jq -r '.version' package.json)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Extracted version: $VERSION"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "version: \"$VERSION\"" > version.yaml
+          ls -l
+
+      - name: Debugging the extracted version
+        run: echo "VERSION is ${{ env.VERSION }}"
+
+      - name: Upload Version artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: version
+          path: version.yaml
 
   docker:
     needs: prepare
@@ -28,24 +35,45 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: version
+
+      - name: Load version into environment
+        run: |
+          VERSION=$(grep 'version:' version.yaml | cut -d'"' -f2)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Using version $VERSION"
+
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.Docker_UNAME }}
           password: ${{ secrets.Docker_PAT }}
 
-      - name: Build and push Docker image
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: basil6789/nodeapp:${{ needs.prepare.outputs.version }}
+          tags: basil6789/nodeapp:${{ env.VERSION }}
 
   deploy:
     needs: docker
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy on server
+      - name: Download version artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: version
+
+      - name: Load version into environment
+        run: |
+          VERSION=$(grep 'version:' version.yaml | cut -d'"' -f2)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: SSH to server and deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
@@ -53,11 +81,9 @@ jobs:
           key: ${{ secrets.KEY }}
           port: 22
           script: |
-            VERSION=${{ needs.prepare.outputs.version }}
-            echo "Deploying version $VERSION"
-
-            docker pull basil6789/nodeapp:$VERSION
+            echo "Remote deploy"
+            docker pull basil6789/nodeapp:${VERSION}
             docker stop nodeapp || true
             docker rm nodeapp || true
-            docker run -d -p 81:3000 --name nodeapp basil6789/nodeapp:$VERSION
+            docker run -d -p 81:3000 --name nodeapp basil6789/nodeapp:${VERSION}
             docker ps
