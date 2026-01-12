@@ -125,7 +125,7 @@ jobs:
           key: ${{ secrets.KEY }}
           port: 22
           script: |
-            docker pull basil6789/nodeapp:${VERSION}
+            docker pull basil6789/nodeapp:
             docker stop nodeapp || true
             docker rm nodeapp || true
             docker run -d -p 81:3000 --name nodeapp basil6789/nodeapp:${VERSION}
