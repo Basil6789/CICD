@@ -73,7 +73,7 @@ jobs:
           path: artifacts/
 
   docker:
-    needs: prepare
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -119,13 +119,16 @@ jobs:
 
       - name: SSH to server and deploy
         uses: appleboy/ssh-action@v1.0.3
+        
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.HOST_NAME }}
           key: ${{ secrets.KEY }}
           port: 22
           script: |
-            docker pull basil6789/nodeapp:
+            echo "Deploying version: $VERSION"
+            docker pull basil6789/nodeapp:${VERSION}
             docker stop nodeapp || true
             docker rm nodeapp || true
             docker run -d -p 81:3000 --name nodeapp basil6789/nodeapp:${VERSION}
+            docker ps 
