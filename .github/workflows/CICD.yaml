@@ -25,64 +25,21 @@ jobs:
       - name: Upload Version artifact
         uses: actions/upload-artifact@v4
         with:
-          name: build
+          name: version
           path: version.yaml
 
   build:
     needs: prepare
     runs-on: ubuntu-latest
     steps:
-          - name: Checkout repo
-            uses: actions/checkout@v4
-
-          - name: Download artifact
-            uses: actions/download-artifact@v4
-            with:
-             name: version
-             path: .
-
-          - name: Load version into environment
-            run: |
-              VERSION=$(grep 'version:' version.yaml | cut -d'"' -f2)
-              echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-              echo "Using version $VERSION"
-
-          - name: Setup Nodejs
-            uses: actions/setup-node@v4
-            with:
-              node-version: "20"
-              cache: 'npm'
-
-          - name: Install dep
-            run: npm i
-          - name: Package app artifact
-            run: |
-             ARTIFACT_NAME="nodeapp-${VERSION}-${GITHUB_SHA:0:7}.tgz"
-             mkdir -p artifacts
-             mkdir -p artifact-temp
-             shopt -s extglob
-             cp -r !(artifact-temp|artifacts|.git|.github) artifact-temp/
-             tar -czf "artifacts/$ARTIFACT_NAME" -C artifact-temp .
-             rm -rf artifact-temp
-             ls -R artifacts
-
-          - name: Upload build artifacts
-            uses: actions/upload-artifact@v4
-            with:
-              name: app-build
-              path: artifacts/
-
-  docker:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Download artifact
+      - name: Download version artifact
         uses: actions/download-artifact@v4
         with:
           name: version
+          path: .
 
       - name: Load version into environment
         run: |
@@ -90,11 +47,47 @@ jobs:
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "Using version $VERSION"
 
-      - name: debugging the extracted version
-        run: echo $VERSION
+      - name: Setup Nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
 
-      - name: Download artifact
+      - name: Install dep
+        run: npm i
+
+      - name: Package app artifact
+        run: |
+          ARTIFACT_NAME="nodeapp-${VERSION}-${GITHUB_SHA:0:7}.tgz"
+          mkdir -p artifacts artifact-temp
+          shopt -s extglob
+          cp -r !(artifact-temp|artifacts|.git|.github) artifact-temp/
+          tar -czf "artifacts/$ARTIFACT_NAME" -C artifact-temp .
+          rm -rf artifact-temp
+          ls -R artifacts
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-build
+          path: artifacts/
+
+  docker:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download version artifact
         uses: actions/download-artifact@v4
+        with:
+          name: version
+          path: .
+
+      - name: Load version into environment
+        run: |
+          VERSION=$(grep 'version:' version.yaml | cut -d'"' -f2)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
@@ -117,6 +110,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: version
+          path: .
 
       - name: Load version into environment
         run: |
@@ -131,9 +125,7 @@ jobs:
           key: ${{ secrets.KEY }}
           port: 22
           script: |
-            echo "Remote deploy"
             docker pull basil6789/nodeapp:${VERSION}
             docker stop nodeapp || true
             docker rm nodeapp || true
             docker run -d -p 81:3000 --name nodeapp basil6789/nodeapp:${VERSION}
-            docker ps
