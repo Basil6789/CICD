@@ -59,7 +59,7 @@ jobs:
 
           context: .
           push: true
-          tags: basil6789/nodeapp:555
+          tags: basil6789/nodeapp:{{ENV_VERSION}}
 
   deploy:
     runs-on: ubuntu-latest
