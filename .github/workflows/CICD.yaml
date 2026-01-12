@@ -17,11 +17,12 @@ jobs:
         run: |
          VERSION=$(jq -r '.version' package.json)
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-         echo "version: $VERSION" > version.yaml
+          echo "version: $VERSION" > version.yaml
          ls -l
 
       - name: Debugging the etracted version
-        run: echo $VERSION   
+        run: echo "VERSION is ${{ env.VERSION}}"
+      
         
       - name: Upload Version artifact
         uses: actions/upload-artifact@v4
@@ -41,7 +42,7 @@ jobs:
 
       - name: load version into envrioment
         run: | 
-         VERSION=$(grep 'version' version.yaml | cut -d'"' -f2
+         VERSION=$(grep 'version' version.yaml | cut -d'"' -f2)
          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
 
@@ -59,7 +60,7 @@ jobs:
 
           context: .
           push: true
-          tags: basil6789/nodeapp:${{ENV.VERSION}}
+          tags: basil6789/nodeapp:${{env.VERSION}}
 
   deploy:
     runs-on: ubuntu-latest
@@ -75,8 +76,8 @@ jobs:
           port: 22
           script: |
             echo "Remote deploy"
-            docker pull basil6789/nodeapp:${{ENV.VERSION}}
+            docker pull basil6789/nodeapp:${{env.VERSION}}
             docker stop nodeapp || true
             docker rm nodeapp || true
-            docker run -d -p 81:3000 --name nodeapp basil6789/nodeapp:${{ENV.VERSION}}
+            docker run -d -p 81:3000 --name nodeapp basil6789/nodeapp:${{env.VERSION}}
             docker ps 
