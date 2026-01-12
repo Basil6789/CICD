@@ -28,7 +28,8 @@ jobs:
           name: version
           path: version.yaml
 
-  build1:
+  build:
+    needs: prepare
     runs-on: ubuntu-latest
     steps:
           - name: Checkout repo
@@ -38,6 +39,7 @@ jobs:
             uses: actions/download-artifact@v4
             with:
              name: version
+             path: .
 
           - name: Load version into environment
             run: |
