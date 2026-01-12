@@ -28,7 +28,7 @@ jobs:
           name: version
           path: version.yaml
 
-  build:
+  build1:
     runs-on: ubuntu-latest
     steps:
           - name: Checkout repo
