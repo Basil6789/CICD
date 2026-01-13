@@ -88,16 +88,19 @@ jobs:
         run: |
           VERSION=$(grep 'version:' version.yaml | cut -d'"' -f2)
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "using version $VERSION"
           
           - name: Download artifact
             uses: actions/download-artifact@v4
             with:
              name: app-build
+             path: .
 
           - name: Extract app artifact
             run: |
               mkdir -p app
-              tar -xzf $(ls nodeapp-*.tgz head -n -l) -c app
+               tar -xzf artifacts/nodeapp-*.tgz -C app
+               ls -R app
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
