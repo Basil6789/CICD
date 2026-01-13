@@ -99,7 +99,7 @@ jobs:
       - name: Extract app artifact
         run: |
           mkdir -p app
-          tar -xzf artifacts/nodeapp-*.tgz -C app
+          tar -xzf nodeapp-*.tgz -C app
           ls -R app
 
       - name: Login to DockerHub
